@@ -5,24 +5,26 @@
         public static Dictionary<string, int> Plan(string target, int quantity, Dictionary<string, int> inventory, Dictionary<string, Recipe> recipes)
         {
             var result = new Dictionary<string, int>();
+            AddMaterials(target, quantity, inventory, recipes, result);
+            return result;
+        }
 
-            if (recipes.TryGetValue(target, out var recipe))
+        private static void AddMaterials(string item, int quantity, Dictionary<string, int> inventory, Dictionary<string, Recipe> recipes, Dictionary<string, int> result)
+        {
+            if (recipes.TryGetValue(item, out var recipe))
             {
-                foreach(var ingredient in recipe.Ingredients)
+                foreach (var ingredient in recipe.Ingredients)
                 {
-                    result[ingredient.Name] = ingredient.Count * quantity;
+                    AddMaterials(ingredient.Name, ingredient.Count * quantity, inventory, recipes, result);
                 }
-
             }
             else
             {
-                int owned = inventory.GetValueOrDefault(target);
+                // Raw material → subtract what we own, then add to the tally.
+                int owned = inventory.GetValueOrDefault(item);
                 int need = Math.Max(0, quantity - owned);
-
-                result[target] = need;
+                result[item] = result.GetValueOrDefault(item) + need;
             }
-
-            return result;
         }
     }
 }
