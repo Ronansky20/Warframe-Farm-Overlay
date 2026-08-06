@@ -29,5 +29,15 @@ namespace Core.Tests
 
             Assert.True(recipes.ContainsKey("Ash"));
         }
+
+        [Fact]
+        public void Parse_NamesComponentsByDropTypeWithCorrectCount()
+        {
+            var recipes = WarframeDataAdapter.Parse(AshJson);
+
+            var ash = recipes["Ash"];
+
+            Assert.Contains(ash.Ingredients, i => i.Name == "Ash Chassis Blueprint" && i.Count == 1);
+        }
     }
 }
