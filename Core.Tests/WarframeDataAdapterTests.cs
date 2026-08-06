@@ -113,5 +113,15 @@ namespace Core.Tests
             Assert.NotNull(chassis.BestLocation);
             Assert.Equal("Pluto/Fenton's Field", chassis.BestLocation!.Location);
         }
+
+        [Fact]
+        public void Parse_LeavesBestLocationNullWhenThereAreNoDrops()
+        {
+            var recipes = WarframeDataAdapter.Parse(ResourceJson);
+
+            var cell = recipes["Ash"].Ingredients.First(i => i.Name == "Orokin Cell");
+
+            Assert.Null(cell.BestLocation);
+        }
     }
 }
