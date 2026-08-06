@@ -30,5 +30,14 @@ namespace Core
     {
         [JsonPropertyName("type")]
         public string Type { get; set; } = "";
+
+        [JsonPropertyName("location")]
+        public string Location { get; set; } = "";
+
+        [JsonPropertyName("chance")]
+        public double Chance { get; set; }
+
+        [JsonPropertyName("rarity")]
+        public string Rarity { get; set; } = "";
     }
 }

@@ -17,7 +17,8 @@ namespace Core
                 foreach (var component in warframe.Components)
                 {
                     string name = ResolveName(component, warframe.Name);
-                    ingredients.Add(new Ingredient(name, component.ItemCount));
+                    DropLocation? best = FindBestLocation(component);
+                    ingredients.Add(new Ingredient(name, component.ItemCount, best));
                 }
 
                 recipes[warframe.Name] = new Recipe(ingredients);
@@ -28,16 +29,28 @@ namespace Core
 
         private static string ResolveName(ComponentDto component, string frameName)
         {
-            // 1. Has drops → use the drop's type (e.g. "Ash Chassis Blueprint").
             if (component.Drops.Count > 0)
                 return component.Drops[0].Type;
 
-            // 2. Main blueprint (no drops) → prefix with frame name (e.g. "Ash Blueprint").
             if (component.Name == "Blueprint")
                 return $"{frameName} {component.Name}";
 
-            // 3. Otherwise it's a resource (e.g. "Orokin Cell") → use its own name.
             return component.Name;
+        }
+
+        private static DropLocation? FindBestLocation(ComponentDto component)
+        {
+            if (component.Drops.Count == 0)
+                return null;
+
+            DropDto best = component.Drops[0];
+            foreach (var drop in component.Drops)
+            {
+                if (drop.Chance > best.Chance)
+                    best = drop;
+            }
+
+            return new DropLocation(best.Location, best.Chance, best.Rarity);
         }
     }
 }
