@@ -16,10 +16,7 @@ namespace Core
 
                 foreach (var component in warframe.Components)
                 {
-                    string name = component.Drops.Count > 0
-                        ? component.Drops[0].Type
-                        : component.Name;
-
+                    string name = ResolveName(component, warframe.Name);
                     ingredients.Add(new Ingredient(name, component.ItemCount));
                 }
 
@@ -27,6 +24,20 @@ namespace Core
             }
 
             return recipes;
+        }
+
+        private static string ResolveName(ComponentDto component, string frameName)
+        {
+            // 1. Has drops → use the drop's type (e.g. "Ash Chassis Blueprint").
+            if (component.Drops.Count > 0)
+                return component.Drops[0].Type;
+
+            // 2. Main blueprint (no drops) → prefix with frame name (e.g. "Ash Blueprint").
+            if (component.Name == "Blueprint")
+                return $"{frameName} {component.Name}";
+
+            // 3. Otherwise it's a resource (e.g. "Orokin Cell") → use its own name.
+            return component.Name;
         }
     }
 }

@@ -21,6 +21,9 @@ namespace Core
 
         [JsonPropertyName("drops")]
         public List<DropDto> Drops { get; set; } = new();
+
+        [JsonPropertyName("type")]
+        public string Type { get; set; } = "";
     }
 
     public class DropDto

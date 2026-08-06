@@ -39,5 +39,50 @@ namespace Core.Tests
 
             Assert.Contains(ash.Ingredients, i => i.Name == "Ash Chassis Blueprint" && i.Count == 1);
         }
+
+        private const string TwoFramesJson = """
+            [
+              {
+                "name": "Ash",
+                "components": [
+                  { "name": "Blueprint", "itemCount": 1, "drops": [] }
+                ]
+              },
+              {
+                "name": "Rhino",
+                "components": [
+                  { "name": "Blueprint", "itemCount": 1, "drops": [] }
+                ]
+              }
+            ]
+            """;
+
+        private const string ResourceJson = """
+            [
+              {
+                "name": "Ash",
+                "components": [
+                  { "name": "Orokin Cell", "itemCount": 1, "drops": [], "type": "Resource" }
+                ]
+              }
+            ]
+            """;
+
+        [Fact]
+        public void Parse_KeepsResourcesUnderTheirOwnName()
+        {
+            var recipes = WarframeDataAdapter.Parse(ResourceJson);
+
+            Assert.Contains(recipes["Ash"].Ingredients, i => i.Name == "Orokin Cell" && i.Count == 1);
+        }
+
+        [Fact]
+        public void Parse_GivesEachWarframesBlueprintAUniqueName()
+        {
+            var recipes = WarframeDataAdapter.Parse(TwoFramesJson);
+
+            Assert.Contains(recipes["Ash"].Ingredients, i => i.Name == "Ash Blueprint");
+            Assert.Contains(recipes["Rhino"].Ingredients, i => i.Name == "Rhino Blueprint");
+        }
     }
 }
