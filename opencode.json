@@ -1,0 +1,38 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "plan",
+  "permission": {
+    "external_directory": "deny",
+    "read": {
+      "*": "allow",
+      "**/bin/**": "deny",
+      "**/obj/**": "deny"
+    },
+    "edit": {
+      "*": "ask",
+      "**/bin/**": "deny",
+      "**/obj/**": "deny",
+      "*.sln": "deny",
+      "*.csproj": "deny"
+    },
+    "bash": {
+      "*": "ask",
+      "dotnet build*": "allow",
+      "dotnet test*": "allow",
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git commit*": "deny",
+      "git push*": "deny",
+      "git reset*": "deny",
+      "git checkout*": "deny",
+      "git clean*": "deny",
+      "rm *": "deny",
+      "Remove-Item*": "deny",
+      "del *": "deny",
+      "rd *": "deny",
+      "rmdir*": "deny",
+      "Clear-Content*": "deny"
+    }
+  }
+}
