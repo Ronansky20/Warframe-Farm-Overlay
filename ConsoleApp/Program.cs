@@ -7,6 +7,13 @@ string[] urls =
     "https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json/Primary.json",
     "https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json/Secondary.json",
     "https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json/Melee.json",
+    "https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json/Archwing.json",
+    "https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json/Arch-Gun.json",
+    "https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json/Arch-Melee.json",
+    "https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json/Sentinels.json",
+    "https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json/SentinelWeapons.json",
+    "https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json/Pets.json",
+    "https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json/Gear.json",
 };
 
 using var http = new HttpClient();
@@ -15,13 +22,17 @@ var recipes = new Dictionary<string, Recipe>();
 
 foreach (string url in urls)
 {
-    Console.WriteLine($"Fetching {url.Split('/').Last()}...");
-    string json = await http.GetStringAsync(url);
-
-    var parsed = WarframeDataAdapter.Parse(json);
-    foreach (var entry in parsed)
+    try
     {
-        recipes[entry.Key] = entry.Value; // add/merge into the combined set
+        Console.WriteLine($"Fetching {url.Split('/').Last()}...");
+        string json = await http.GetStringAsync(url);
+        var parsed = WarframeDataAdapter.Parse(json);
+        foreach (var entry in parsed)
+            recipes[entry.Key] = entry.Value;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"  Skipped (failed to fetch): {ex.Message}");
     }
 }
 
