@@ -20,7 +20,6 @@
             }
             else
             {
-                // Raw material → subtract what we own, then add to the tally.
                 int owned = inventory.GetValueOrDefault(item);
                 int need = Math.Max(0, quantity - owned);
                 result[item] = result.GetValueOrDefault(item) + need;

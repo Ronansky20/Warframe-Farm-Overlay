@@ -4,7 +4,6 @@ using System.Text;
 
 namespace Core
 {
-
     public record Recipe(List<Ingredient> Ingredients);
 
 }
