@@ -35,5 +35,31 @@ namespace Core.Tests
             Assert.Equal("Berehynia (Sedna)", locations["Orokin Cell"].Location);
             Assert.Equal(5.0, locations["Orokin Cell"].Chance);
         }
+
+        [Fact]
+        public void Parse_StripsQuantityPrefixesFromItemNames()
+        {
+            var json = """
+            {
+              "missionRewards": {
+                "Eris": {
+                  "Candiru": {
+                    "gameMode": "Survival",
+                    "isEvent": false,
+                    "rewards": {
+                      "C": [ { "itemName": "2X Neurodes", "chance": 15.49, "rarity": "Rare" } ]
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+            var locations = MissionRewardsAdapter.Parse(json);
+
+            Assert.True(locations.ContainsKey("Neurodes"));
+            Assert.False(locations.ContainsKey("2X Neurodes"));
+            Assert.Equal("Candiru (Eris)", locations["Neurodes"].Location);
+        }
     }
 }

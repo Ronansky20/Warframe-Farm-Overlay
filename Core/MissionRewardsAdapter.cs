@@ -20,11 +20,13 @@ namespace Core
 
                     foreach (var reward in Flatten(node.Rewards))
                     {
-                        if (best.TryGetValue(reward.ItemName, out var existing)
+                        var name = RewardNameParser.Parse(reward.ItemName).Name;
+
+                        if (best.TryGetValue(name, out var existing)
                             && existing.Chance >= reward.Chance)
                             continue;
 
-                        best[reward.ItemName] = new DropLocation(location, reward.Chance, reward.Rarity);
+                        best[name] = new DropLocation(location, reward.Chance, reward.Rarity);
                     }
                 }
             }
