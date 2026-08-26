@@ -21,6 +21,8 @@ namespace Overlay
             "https://raw.githubusercontent.com/WFCD/warframe-items/master/data/json/Gear.json",
         };
 
+        private const string MissionRewardsUrl =
+            "https://raw.githubusercontent.com/WFCD/warframe-drop-data/main/data/missionRewards.json";
         private Dictionary<string, Recipe> _recipes = new();
         private Dictionary<string, DropLocation> _locations = new();
 
@@ -37,10 +39,20 @@ namespace Overlay
 
             await LoadData();
 
-            StatusText.Text = $"Ready — {_recipes.Count} items loaded.";
+            StatusText.Text = $"Ready — {_recipes.Count} items, {_locations.Count} locations.";
             FarmButton.IsEnabled = true;
 
+            var mockInventory = new Dictionary<string, int>
+            {
+                ["Nekros Prime Chassis Blueprint"] = 1,
+                ["Orokin Cell"] = 2
+            };
+
+            var plan = FarmPlanBuilder.Build(
+                "Nekros Prime", 1, mockInventory, _recipes, _locations);
+
             var overlay = new FarmOverlay();
+            overlay.SetPlan(plan);
             overlay.Show();
         }
 
@@ -57,9 +69,16 @@ namespace Overlay
             ResultsList.Items.Clear();
             foreach (var item in plan)
             {
-                string line = _locations.TryGetValue(item.Key, out var loc)
-                    ? $"{item.Value}x {item.Key} — best at {loc.Location} ({loc.Chance}%)"
-                    : $"{item.Value}x {item.Key} — no drop location";
+                string line;
+                if (_locations.TryGetValue(item.Key, out var loc))
+                {
+                    string chance = loc.Chance.HasValue ? $" ({loc.Chance}%)" : "";
+                    line = $"{item.Value}x {item.Key} — best at {loc.Location}{chance}";
+                }
+                else
+                {
+                    line = $"{item.Value}x {item.Key} — no drop location";
+                }
                 ResultsList.Items.Add(line);
             }
         }
@@ -82,10 +101,26 @@ namespace Overlay
                 }
             }
 
+            var components = new Dictionary<string, DropLocation>();
             foreach (var recipe in _recipes.Values)
                 foreach (var ingredient in recipe.Ingredients)
                     if (ingredient.BestLocation != null)
-                        _locations[ingredient.Name] = ingredient.BestLocation;
+                        components[ingredient.Name] = ingredient.BestLocation;
+
+            var missionRewards = new Dictionary<string, DropLocation>();
+            try
+            {
+                string json = await http.GetStringAsync(MissionRewardsUrl);
+                missionRewards = MissionRewardsAdapter.Parse(json);
+            }
+            catch
+            {
+                // Optional source — fall back to component locations only.
+            }
+
+            _locations = DropLocationMerger.Merge(
+                CuratedResourceLocations.All,
+                DropLocationMerger.Merge(components, missionRewards));
         }
 
         private void TargetBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Overlay"
         mc:Ignorable="d"
         Title="Farm Overlay"
-        Width="320" Height="200"
+        SizeToContent="WidthAndHeight"
         Topmost="True"
         WindowStyle="None"
         ResizeMode="NoResize"
